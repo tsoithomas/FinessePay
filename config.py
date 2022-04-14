@@ -5,3 +5,4 @@ MYSQL_USER = "finesse"
 MYSQL_PASS = "hkbuCOMP7300"
 MYSQL_HOST = "finesse.mysql.pythonanywhere-services.com"
 MYSQL_DATABASE = "finesse$default"
+
