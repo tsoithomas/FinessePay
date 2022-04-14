@@ -2,7 +2,7 @@ from flask import Flask, request, send_from_directory, render_template, redirect
 from flask_dance.contrib.github import make_github_blueprint, github
 from flask_cors import CORS
 from time import time
-import mysql.connector
+import mysql.connector, json, sys
 import config
 
 # app = Flask(__name__)
@@ -131,6 +131,40 @@ def budget():
 
         
     return render_template('budget.html', title=' - Budget', login=github_user['login'])
+ 
+ 
+ 
+@app.route("/search", methods=['GET'])
+def search():
+    if not github.authorized:
+        return redirect('/login')
+    
+    github_user = github.get("/user").json()
+
+    args = request.args
+    term = args["term"]
+    
+    cnx = mysql.connector.connect(user=config.MYSQL_USER, password=config.MYSQL_PASS, host=config.MYSQL_HOST, database=config.MYSQL_DATABASE)
+    cursor = cnx.cursor(buffered=True)
+     
+    query = ("SELECT COUNT(*) FROM account WHERE username LIKE %s")
+    results = cursor.execute(query, (term+"%", ))
+    (count, ) = cursor.fetchone()
+    
+    if count == 1:
+        # print("a"+str(count), file=sys.stderr)
+        query = ("SELECT username FROM account WHERE username LIKE %s")
+        results = cursor.execute(query, (term+"%", ))
+        (username, ) = cursor.fetchone()
+        result = [{"label": username, "value": username, "id": username}]
+    else:
+        # print("b"+str(count), file=sys.stderr)
+        result = [] 
+    
+    cursor.close()
+    cnx.close()
+    
+    return json.dumps(result) 
  
  
   
