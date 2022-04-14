@@ -24,9 +24,14 @@
         </div>
 
         <div id="navbarBasicExample" class="navbar-menu">
+                    {% if login %}
             <div class="navbar-start">
                 <a class="navbar-item" href="/pay">
                     Send payment
+                </a>
+				
+                <a class="navbar-item" href="/pay">
+                    Schedule payment
                 </a>
 				
                 <a class="navbar-item" href="/history">
@@ -37,6 +42,7 @@
                     Budget
                 </a>
             </div>
+                    {% endif %}
 
             <div class="navbar-end">
                 <div class="navbar-item">

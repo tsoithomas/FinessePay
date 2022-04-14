@@ -1,4 +1,4 @@
-from flask import Flask, request, send_from_directory, render_template, redirect, url_for
+from flask import Flask, request, send_from_directory, render_template, redirect, url_for, session
 from flask_dance.contrib.github import make_github_blueprint, github
 from flask_cors import CORS
 from time import time
@@ -33,12 +33,18 @@ def login():
         return redirect(url_for("github.login"))
     return redirect('/')
 
-@app.route("/portfolio")
-def portfolio():
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect('/')
+
+@app.route("/pay")
+def pay():
     if not github.authorized:
         return redirect('/login')
     github_user = github.get("/user").json()
-    return render_template('portfolio.html', title = ' - Portfolio')
+    return render_template('pay.html', title = ' - Send payment', login = github_user['login'])
  
   
 # main driver function
