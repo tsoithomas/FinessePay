@@ -5,7 +5,7 @@ html {
 body {
 	height: 100%;
 	background: rgb(0,184,144);
-	background: linear-gradient(179deg, rgba(0,184,144,1) 50%, rgba(0,157,137,1) 100%);
+	background: linear-gradient(179deg, rgba(0,184,144,1) 50%, rgba(0,140,127,1) 100%);
 }
 
 .title, .subtitle {
