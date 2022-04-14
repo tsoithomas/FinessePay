@@ -1,0 +1,7 @@
+SECRET_KEY = "iwogieog2598fhifwhgn"
+GITHUB_CLIENT_ID = 'b5624ec9aabafd30d2ca'
+GITHUB_CLIENT_SECRET = '5cf774df5acbcd5446219addbd5114d59559ac35'
+MYSQL_USER = "root"
+MYSQL_PASS = ""
+MYSQL_HOST = "localhost"
+MYSQL_DATABASE = "finesse"

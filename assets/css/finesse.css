@@ -25,3 +25,34 @@ p {
 	color: #00b890;
 	font-variant: small-caps;
 }
+
+.balance {
+	width: 200px;
+	margin: 0 auto;
+}
+
+.balance_head, .balance_body, .balance_amount, .balance_currency {
+	color: #fff;
+}
+
+.balance_head {
+	display: block;
+	font-size: 1em;
+}
+
+
+.balance_body {
+	display: block;
+}
+
+
+.balance_amount {
+	font-size: 2.4em;
+	line-height: 0.8em;
+	font-weight: bold;
+}
+
+.balance_currency {
+	font-size: 1em;
+}
+

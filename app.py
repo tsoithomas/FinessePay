@@ -2,6 +2,8 @@ from flask import Flask, request, send_from_directory, render_template, redirect
 from flask_dance.contrib.github import make_github_blueprint, github
 from flask_cors import CORS
 from time import time
+import mysql.connector
+import config
 
 # app = Flask(__name__)
 app = Flask(__name__,
@@ -9,21 +11,38 @@ app = Flask(__name__,
             static_folder='assets',
             template_folder='views')
 CORS(app)
-app.secret_key = "please_define_a_secret_key_here"
-app.config["GITHUB_OAUTH_CLIENT_ID"] = 'b5624ec9aabafd30d2ca'
-app.config["GITHUB_OAUTH_CLIENT_SECRET"] = '5cf774df5acbcd5446219addbd5114d59559ac35'
+app.secret_key = config.SECRET_KEY
+app.config["GITHUB_OAUTH_CLIENT_ID"] = config.GITHUB_CLIENT_ID
+app.config["GITHUB_OAUTH_CLIENT_SECRET"] = config.GITHUB_CLIENT_SECRET
 blueprint = make_github_blueprint()
 app.register_blueprint(make_github_blueprint(), url_prefix="/login")
 
-# @app.route("/")
-# def hello_world():
-#     return "<p>Hello, World!</p>"
 
+        
 @app.route("/")
 def index():
     if github.authorized:
         github_user = github.get("/user").json()
-        return render_template('index.html', title = ' - Index', login = github_user['login'])
+        
+        cnx = mysql.connector.connect(user=config.MYSQL_USER, password=config.MYSQL_PASS, host=config.MYSQL_HOST, database=config.MYSQL_DATABASE)
+        cursor = cnx.cursor(buffered=True)
+         
+        
+        query = ("SELECT user_id, balance FROM account WHERE username = %s")
+        results = cursor.execute(query, (github_user["login"], ))
+        if cursor.rowcount > 0:
+            (user_id, balance) = cursor.fetchone()
+        else:
+            query = ("INSERT IGNORE INTO account(username, nickname, balance, budget) VALUES (%s, %s, 1000, 0)")
+            cursor.execute(query, (github_user["login"], github_user["name"]))
+            cnx.commit()   
+
+        
+        cursor.close()
+        cnx.close()
+        
+        
+        return render_template('index.html', title = ' - Index', login = github_user['login'], balance=balance)
     else:
         return render_template('index.html', title = ' - Index')
 
@@ -31,6 +50,8 @@ def index():
 def login():
     if not github.authorized:
         return redirect(url_for("github.login"))
+
+        
     return redirect('/')
 
 
@@ -45,6 +66,9 @@ def pay():
         return redirect('/login')
     github_user = github.get("/user").json()
     return render_template('pay.html', title = ' - Send payment', login = github_user['login'])
+ 
+
+
  
   
 # main driver function
