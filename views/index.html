@@ -1,19 +1,27 @@
 {% include "head.html" ignore missing %}
 <section class="section">
     <div class="container">
-        <h1 class="title">
-            Hello World
-        </h1>
-        <p class="subtitle">
-            My first website with <strong>Bulma</strong>!
-        </p>
+		<div style="text-align: center">
+			<img src="/img/p2p.png" style="width: 100px; height: 100px; border-radius: 50%; border: 10px solid rgba(255,255,255,0.2);">
+		
+			<h1 class="title">
+				Connecting people
+			</h1>
+			<p class="subtitle">
+				HK's No.1 P2P Payment App!
+			</p>
+		</div>
     </div>
 </section>
 
 <section class="section">
     <div class="container">
         <div class="columns is-multiline">
-
+			{% if login %}
+				some graphs here
+			{% else %}
+			
+			{% endif %}
         </div>
     </div>
 </section>

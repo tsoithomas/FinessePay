@@ -1,5 +1,27 @@
+html {
+	background-color: #00b890 !important;
+}
+
+.title, .subtitle {
+	color: #fff;
+}
+
+H1 {
+	color: #fff;
+}
+p {
+	color: #fff;
+}
 #narbar-logo {
+	
+	background-image: url("/img/logo.png");
+	background-repeat: no-repeat;
+	background-size: 40px 40px;
+	background-position: 10px center;
+	padding-left: 60px;
 	font-size: 30px;
+	line-height: 30px;
 	font-weight: bold;
-	color: #06d6a9;
+	color: #00b890;
+	font-variant: small-caps;
 }

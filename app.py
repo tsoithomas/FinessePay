@@ -10,8 +10,8 @@ app = Flask(__name__,
             template_folder='views')
 CORS(app)
 app.secret_key = "please_define_a_secret_key_here"
-app.config["GITHUB_OAUTH_CLIENT_ID"] = 'YOUR_GITHUB_CLIENT_ID'
-app.config["GITHUB_OAUTH_CLIENT_SECRET"] = 'YOUR_GITHUB_CLIENT_SECRET'
+app.config["GITHUB_OAUTH_CLIENT_ID"] = 'b5624ec9aabafd30d2ca'
+app.config["GITHUB_OAUTH_CLIENT_SECRET"] = '5cf774df5acbcd5446219addbd5114d59559ac35'
 blueprint = make_github_blueprint()
 app.register_blueprint(make_github_blueprint(), url_prefix="/login")
 
@@ -43,4 +43,4 @@ def portfolio():
   
 # main driver function
 if __name__ == '__main__':
-    app.run()
+    app.run(ssl_context=('cert.pem', 'key.pem'))
