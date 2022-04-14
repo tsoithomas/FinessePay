@@ -27,7 +27,6 @@ def index():
         cnx = mysql.connector.connect(user=config.MYSQL_USER, password=config.MYSQL_PASS, host=config.MYSQL_HOST, database=config.MYSQL_DATABASE)
         cursor = cnx.cursor(buffered=True)
          
-        
         query = ("SELECT user_id, balance FROM account WHERE username = %s")
         results = cursor.execute(query, (github_user["login"], ))
         if cursor.rowcount > 0:
@@ -50,8 +49,6 @@ def index():
 def login():
     if not github.authorized:
         return redirect(url_for("github.login"))
-
-        
     return redirect('/')
 
 
@@ -64,11 +61,77 @@ def logout():
 def pay():
     if not github.authorized:
         return redirect('/login')
+        
     github_user = github.get("/user").json()
-    return render_template('pay.html', title = ' - Send payment', login = github_user['login'])
+    
+
+    cnx = mysql.connector.connect(user=config.MYSQL_USER, password=config.MYSQL_PASS, host=config.MYSQL_HOST, database=config.MYSQL_DATABASE)
+    cursor = cnx.cursor(buffered=True)
+     
+    query = ("SELECT user_id, balance FROM account WHERE username = %s")
+    cursor.execute(query, (github_user["login"], ))
+    if cursor.rowcount > 0:
+        (user_id, balance) = cursor.fetchone()
+        
+    categories = []
+    query = ("SELECT category_id, category_name FROM category ORDER BY category_id")
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    for (category_id, category_name) in rows:
+        categories.append({"id": category_id, "name": category_name})
+        
+    return render_template('pay.html', title=' - Send payment', login=github_user['login'], categories=categories)
  
 
 
+@app.route("/schedule")
+def schedule():
+    if not github.authorized:
+        return redirect('/login')
+        
+    github_user = github.get("/user").json()
+    
+
+    cnx = mysql.connector.connect(user=config.MYSQL_USER, password=config.MYSQL_PASS, host=config.MYSQL_HOST, database=config.MYSQL_DATABASE)
+    cursor = cnx.cursor(buffered=True)
+     
+    query = ("SELECT user_id, balance FROM account WHERE username = %s")
+    cursor.execute(query, (github_user["login"], ))
+    if cursor.rowcount > 0:
+        (user_id, balance) = cursor.fetchone()
+        
+    categories = []
+    query = ("SELECT category_id, category_name FROM category ORDER BY category_id")
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    for (category_id, category_name) in rows:
+        categories.append({"id": category_id, "name": category_name})
+        
+    return render_template('schedule.html', title=' - Schedule payment', login=github_user['login'], categories=categories)
+ 
+ 
+@app.route("/history")
+def history():
+    if not github.authorized:
+        return redirect('/login')
+        
+    github_user = github.get("/user").json()
+
+        
+    return render_template('history.html', title=' - Payment history', login=github_user['login'])
+ 
+ 
+ 
+@app.route("/budget")
+def budget():
+    if not github.authorized:
+        return redirect('/login')
+        
+    github_user = github.get("/user").json()
+
+        
+    return render_template('budget.html', title=' - Budget', login=github_user['login'])
+ 
  
   
 # main driver function
