@@ -63,13 +63,18 @@
 
 <script>
 $(function() {
-	$("#payee").autocomplete({
-		source: "/search",
-		minLength: 3,
-		select: function( event, ui ) {
-			//console.log( "Selected: " + ui.item.value + " aka " + ui.item.id );
-		}
+	<!-- $("#payee").autocomplete({ -->
+		<!-- source: "/search", -->
+		<!-- minLength: 3, -->
+		<!-- select: function( event, ui ) { -->
+			<!-- //console.log( "Selected: " + ui.item.value + " aka " + ui.item.id ); -->
+		<!-- } -->
+	<!-- }); -->
+	
+	$("#submit").click(function() {
+		$("#form").submit();
 	});
+	
 });
 </script>
 
@@ -77,18 +82,19 @@ $(function() {
 <section class="section">
     <div class="container">
 
-		<form class="box" id="form">
+		<h1 class="title">Send payment</h1>
+		<form class="box" id="form" action="/pay_submit" method="post">
 		  <div class="field">
 			<label class="label">Payee username</label>
 			<div class="control">
-				<input class="input is-primary" type="payee" id="payee">
+				<input class="input is-primary" type="input" name="payee" id="payee">
 			</div>
 		  </div>
 
 		  <div class="field">
 			<label class="label">Amount</label>
 			<div class="control">
-				<input class="input is-primary" type="amount">
+				<input class="input is-primary" type="number" name="amount" id="amount">
 			</div>
 		  </div>
 
@@ -99,7 +105,7 @@ $(function() {
 				<div class = "field">
 					<div class = "control">
 						<div class = "select is-primary">
-							<select>
+							<select name="category" id="category">
 								{% for category in categories %}
 								<option value="{{category.id}}">{{category.name}}</option>
 								{% endfor %}
@@ -110,7 +116,7 @@ $(function() {
 			</div>
 		  </div>
 
-		  <button class="button is-primary">Send payment</button>
+		  <button class="button is-primary" id="submit">Send payment</button>
 		</form>
 
     </div>

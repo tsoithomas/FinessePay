@@ -6,11 +6,61 @@ $(function() {
 });
 </script>
 
+<style>
+.party {
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+
+.amount {
+	text-align: right !important;
+	font-weight: bold;
+}
+
+.green {
+	color: darkgreen;
+}
+
+.red {
+	color: darkred;
+}
+
+</style>
 
 <section class="section">
     <div class="container">
+        <div class="columns is-multiline">
+			<div class="balance">
+				<div class="balance_head">Balance:</div>
+				<div class="balance_body"><span class="balance_amount">{{balance}}</span><span class="balance_currency">HKD</span></div>
+			</div>
+        </div>
+    </div>
+</section>
 
-		History
+<section class="section">
+    <div class="container">
+		<h1 class="title">Payment history</h1>
+		<div class="box">
+			<table class="table is-striped is-fullwidth">
+			  <tbody>
+				{% for record in records %}
+				<tr>
+					<td colspan=2>{{record.date}}</td>
+				</tr>
+				{% for transaction in record.transactions %}
+				<tr>
+					<td>
+						<div class="party">{{transaction.party}}</div>
+						<div class="category">{{transaction.category}}</div>
+					</td>
+					<td class="amount {{transaction.style}}">{{transaction.amount}}</td>
+				</tr>
+				{% endfor %}
+				{% endfor %}
+			  </tbody>
+			</table>
+		</div>
     </div>
 </section>
 
