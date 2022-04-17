@@ -1,25 +1,119 @@
+$white: hsl(0, 0%, 100%) !default;
+$black: hsl(0, 0%, 4%);
+// $navbar-height: 3.25rem !default;
+// $navbar-background-color: $white !default;
+$modal-background-background-color: rgba($black, 0.86) !default;
+
+.overlay {
+  min-height: 100%;
+  min-width: 100%;
+  display: none;
+  z-index: 399;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: $modal-background-background-color;
+  cursor: pointer;
+  transition: all 600ms ease;
+  &.on {
+    display: block;
+  }
+}
+
+.navbar {
+  position: fixed !important;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  .navbar-brand {
+    justify-content: flex-end;
+    flex-grow: 1;
+    flex-shrink: 0;
+    background-color: #010101;
+  }
+  .navbar-burger {
+    margin-left: 0;
+    margin-right: auto;
+  }
+  @media (min-width: 1008px) {
+    left: 250px;
+  }
+}
+.right {
+  justify-content: flex-end;
+}
+
+// .left {
+//   background-color: green;
+//   justify-content: flex-start;
+// }
+
+.sidebar {
+  top: 0;
+  left: -250px;
+  position: fixed;
+
+  width: 250px;
+  height: 100%;
+  background-color: whitesmoke;
+  overflow-y: auto;
+  transition: all 600ms ease;
+  z-index: 400;
+  box-shadow: 0 2px 3px rgba($black, 0.1), 0 0 0 1px rgba($black, 0.1);
+  .menu {
+    margin: 0.5em;
+    position: relative;
+  }
+  &.on {
+    margin-left: 250px;
+  }
+  @media (min-width: 1008px) {
+    left: 0;
+    &.on {
+      margin-left: 0;
+    }
+  }
+}
+
+.content {
+  margin-top: 5em;
+  float: left;
+  @media (min-width: 1008px) {
+    margin-left: 250px;
+  }
+}
+
+
+
 html {
 	height: 100%;
 }
 
 body {
-	height: 100%;
+	min-height: 100%;
 	background: rgb(0,184,144);
 	background: linear-gradient(179deg, rgba(0,184,144,1) 50%, rgba(0,140,127,1) 100%);
+	background-attachment: fixed;
+}
+
+#container {
+	padding-top: 30px;
 }
 
 .title, .subtitle {
 	color: #fff;
 }
 
-H1 {
+#frontpage H1 {
 	color: #fff;
 }
-p {
+#frontpage p {
 	color: #fff;
 }
+
 #narbar-logo {
-	
 	background-image: url("/img/logo.png");
 	background-repeat: no-repeat;
 	background-size: 40px 40px;
@@ -62,3 +156,11 @@ p {
 	font-size: 1em;
 }
 
+.navbar-burger {
+	/* margin-left: 0px; */
+}
+
+.pushy-separator hr {
+	margin: 12px;
+	background-color: #444;
+}

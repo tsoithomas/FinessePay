@@ -2,7 +2,7 @@ from flask import Flask, request, send_from_directory, render_template, redirect
 from flask_dance.contrib.github import make_github_blueprint, github
 from flask_cors import CORS
 from time import time
-import mysql.connector, json, sys
+import mysql.connector, json, sys, hashlib, re
 import config
 
 # app = Flask(__name__)
@@ -64,7 +64,6 @@ def pay():
         
     github_user = github.get("/user").json()
     
-
     cnx = mysql.connector.connect(user=config.MYSQL_USER, password=config.MYSQL_PASS, host=config.MYSQL_HOST, database=config.MYSQL_DATABASE)
     cursor = cnx.cursor(buffered=True)
      
@@ -94,7 +93,6 @@ def pay_submit():
     github_user = github.get("/user").json()
     
     payer = get_user(github_user['login'])
-    print(payer, file=sys.stderr)
     payer_id = payer["user_id"]
     
     payee = get_user(request.form.get('payee'))
@@ -102,13 +100,14 @@ def pay_submit():
     
     amount = request.form.get('amount')
     category_id = request.form.get('category')
-
-    if payee_id is not None:
+    
+    if payee_id is not None and re.match("^\d+(\.\d{0,2})?$", str(amount)) is not None:
         cnx = mysql.connector.connect(user=config.MYSQL_USER, password=config.MYSQL_PASS, host=config.MYSQL_HOST, database=config.MYSQL_DATABASE)
         cursor = cnx.cursor(buffered=True)
         
         insert_payment = ("INSERT INTO payment (payer_id, payee_id, amount, category_id, payment_time) VALUES(%s, %s, %s, %s, NOW())")
         cursor.execute(insert_payment, (payer_id, payee_id, amount, category_id))
+        payment_id = cursor.lastrowid
         
         update_payer_balance = ("UPDATE account SET balance = balance - %s WHERE user_id = %s")
         cursor.execute(update_payer_balance, (amount, payer_id))
@@ -117,15 +116,38 @@ def pay_submit():
         cursor.execute(update_payee_balance, (amount, payee_id))
         
         cnx.commit()
+            
+        cursor.close()
+        cnx.close()
+                
+        refid = hashlib.sha1(str(payment_id).encode()).hexdigest()[0:6]
+        return redirect('/pay_succuess?q='+refid)
+    else:
+        return redirect('/pay_fail')
+    
+ 
+@app.route("/pay_succuess", methods=['GET'])
+def pay_succuess():
+    if not github.authorized:
+        return redirect('/login')
         
+    github_user = github.get("/user").json()
 
-    cursor.close()
-    cnx.close()
-        
-    return payee
+    args = request.args
+    refid = args["q"]
+    
+    return render_template('pay_success.html', title=' - Send payment', login=github_user['login'], refid=refid)
  
 
-
+@app.route("/pay_fail")
+def pay_fail():
+    if not github.authorized:
+        return redirect('/login')
+        
+    github_user = github.get("/user").json()
+    
+    return render_template('pay_fail.html', title=' - Send payment', login=github_user['login'])
+ 
 @app.route("/schedule")
 def schedule():
     if not github.authorized:
@@ -236,7 +258,6 @@ def history():
     return render_template('history.html', title=' - Payment history', login=github_user['login'], balance=user["balance"], records=records)
  
  
- 
 @app.route("/budget")
 def budget():
     if not github.authorized:
@@ -282,6 +303,38 @@ def search():
     cnx.close()
     
     return json.dumps(result) 
+
+
+ 
+@app.route("/check_user", methods=['POST'])
+def check_user():
+    if not github.authorized:
+        return redirect('/login')
+    
+    github_user = github.get("/user").json()
+    payer = github_user['login']
+    
+    term = request.form.get('s')
+       
+    cnx = mysql.connector.connect(user=config.MYSQL_USER, password=config.MYSQL_PASS, host=config.MYSQL_HOST, database=config.MYSQL_DATABASE)
+    cursor = cnx.cursor(buffered=True)
+     
+    query = ("SELECT COUNT(*) FROM account WHERE username = %s AND username != %s")
+    results = cursor.execute(query, (term, payer))
+    (count, ) = cursor.fetchone()
+    
+    if count == 1:
+        # print("a"+str(count), file=sys.stderr)
+        result = {"is_valid": True}
+    else:
+        # print("b"+str(count), file=sys.stderr)
+        result = {"is_valid": False}
+    
+    cursor.close()
+    cnx.close()
+    
+    return json.dumps(result) 
+
 
 def get_user(username: str):
     cnx = mysql.connector.connect(user=config.MYSQL_USER, password=config.MYSQL_PASS, host=config.MYSQL_HOST, database=config.MYSQL_DATABASE)

@@ -58,22 +58,73 @@
     background-image: none;
 }
 
-
+.status {
+	color: #eb623f;
+	padding-top: 5px;
+}
 </style>
 
 <script>
 $(function() {
-	<!-- $("#payee").autocomplete({ -->
-		<!-- source: "/search", -->
-		<!-- minLength: 3, -->
-		<!-- select: function( event, ui ) { -->
-			<!-- //console.log( "Selected: " + ui.item.value + " aka " + ui.item.id ); -->
-		<!-- } -->
-	<!-- }); -->
+	var valid_user = false;
+	var valid_amount = false;
+	
+	// check username
+	$("#payee").keyup(function (){
+		user = $("#payee").val();
+		if (user.length > 3) {
+			$.ajax({
+				type: "POST",
+				url: "/check_user",
+				data: { s: user},
+				success: function(data) {
+					if (data.is_valid) {
+						$("#payee-status").slideUp("fast");
+						valid_user = true;
+					}
+					else {
+						$("#payee-status").slideDown("fast");
+						valid_user = false;
+					}
+					validate();
+				},
+				dataType: "json"
+			});
+		}
+		else {
+			$("#payee-status").slideDown("fast");
+			valid_user = false;
+			validate();
+		}
+	});
+	
+	// check amount
+	$("#amount").keyup(function (){
+		let re = /^\d+(\.\d{0,2})?$/;
+		if (re.test($("#amount").val())) {
+			$("#amount-status").slideUp("fast");
+			valid_amount = true;
+		}
+		else {
+			$("#amount-status").slideDown("fast");
+			valid_amount = false;
+		}
+		validate();
+	});
 	
 	$("#submit").click(function() {
 		$("#form").submit();
 	});
+	
+	function validate() {
+		if (valid_user && valid_amount) {
+			$('#submit').prop('disabled', false);
+		}
+		else {
+			$('#submit').prop('disabled', true);
+		}
+	}
+	
 	
 });
 </script>
@@ -87,14 +138,30 @@ $(function() {
 		  <div class="field">
 			<label class="label">Payee username</label>
 			<div class="control">
-				<input class="input is-primary" type="input" name="payee" id="payee">
+				<input class="input is-primary" type="input" name="payee" id="payee" pattern="[A-Za-z0-9]+" autocomplete="off" title="Only letters and numbers are allowed.">
+				<div class="status" id="payee-status" style="display: none">
+					<span class="icon-text has-text-danger">
+						<span class="icon">
+							<i class="fas fa-exclamation-triangle"></i>
+						</span>
+						<span class="text">Invalid username</span>
+					</span>
+				</div>
 			</div>
 		  </div>
 
 		  <div class="field">
 			<label class="label">Amount</label>
 			<div class="control">
-				<input class="input is-primary" type="number" name="amount" id="amount">
+				<input class="input is-primary" type="number" name="amount" id="amount" step="0.01" min="0" max="99999" autocomplete="off">
+				<div class="status" id="amount-status" style="display: none">
+					<span class="icon-text has-text-danger">
+						<span class="icon">
+							<i class="fas fa-exclamation-triangle"></i>
+						</span>
+						<span class="text">Invalid amount</span>
+					</span>
+				</div>
 			</div>
 		  </div>
 
@@ -116,7 +183,7 @@ $(function() {
 			</div>
 		  </div>
 
-		  <button class="button is-primary" id="submit">Send payment</button>
+		  <button class="button is-primary" id="submit" disabled >Send payment</button>
 		</form>
 
     </div>
