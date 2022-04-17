@@ -7,6 +7,13 @@ $(function() {
 </script>
 
 <style>
+
+.date {
+	font-weight: bold;
+	font-size: 0.8rem;
+	text-transform: uppercase;
+}
+
 .party {
 	font-weight: bold;
 	margin-bottom: 5px;
@@ -42,11 +49,11 @@ $(function() {
     <div class="container">
 		<h1 class="title">Payment history</h1>
 		<div class="box">
-			<table class="table is-striped is-fullwidth">
+			<table class="table is-fullwidth">
 			  <tbody>
 				{% for record in records %}
 				<tr>
-					<td colspan=2>{{record.date}}</td>
+					<td colspan=2 class="date is-primary">{{record.date}}</td>
 				</tr>
 				{% for transaction in record.transactions %}
 				<tr>

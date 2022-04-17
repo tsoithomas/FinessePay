@@ -2,11 +2,17 @@
 
 <section class="section">
     <div class="container">
-		<div class="box">
-			<div class="block">The payment failed. </div>
-			<div class="block">Please try again later or contact our customer services if the problem continues to exist.</div>
-			<button class="button" onclick="location.href='/'">Back</button>
-		</div>
+		<article class="message is-danger">
+			<div class="message-header">
+				<p>Send payment</p>
+				<button class="delete" aria-label="delete" onclick="location.href='/pay'"></button>
+			</div>
+			<div class="message-body">
+				<div class="block">The payment failed. </div>
+				<div class="block">Please try again later or contact our customer services if the problem continues to exist.</div>
+				<button class="button" onclick="location.href='/pay'">Back</button>
+			</div>
+		</article>
     </div>
 </section>
 

@@ -4,7 +4,7 @@
 
 <section class="section">
     <div class="container">
-        <div class="columns is-multiline">
+        <div class="block">
 			<div class="balance">
 				<div class="balance_head">My balance:</div>
 				<div class="balance_body"><span class="balance_amount">{{balance}}</span><span class="balance_currency">HKD</span></div>
@@ -16,7 +16,7 @@
 {% else %}
 <section class="section">
     <div class="container">
-		<div class="block" style="text-align: center" id="frontpage">
+		<div class="block" style="text-align: center; margin-top: 60px;" id="frontpage">
 			<img src="/img/p2p.png" style="width: 100px; height: 100px; border-radius: 50%; border: 10px solid rgba(255,255,255,0.2);">
 		
 			<h1 class="title">
@@ -25,6 +25,10 @@
 			<p class="subtitle">
 				HK's No.1 P2P Payment App!
 			</p>
+		</div>
+		<div class="block" style="text-align:center">
+			<a class="button is-primary is-light" href="/login">Sign up</a>
+			<a class="button is-warning is-light" href="/login">Log in</a>
 		</div>
     </div>
 </section>
