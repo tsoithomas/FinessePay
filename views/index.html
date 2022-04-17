@@ -4,9 +4,9 @@
 
 <section class="section">
     <div class="container">
-        <div class="block">
-			<div class="balance">
-				<div class="balance_head">My balance:</div>
+        <div class="block balance">
+			<div class="balance_block">
+				<div class="balance_head">Balance:</div>
 				<div class="balance_body"><span class="balance_amount">{{balance}}</span><span class="balance_currency">HKD</span></div>
 			</div>
         </div>
@@ -14,24 +14,55 @@
 </section>
 
 {% else %}
+
+
+
 <section class="section">
-    <div class="container">
-		<div class="block" style="text-align: center; margin-top: 60px;" id="frontpage">
-			<img src="/img/p2p.png" style="width: 100px; height: 100px; border-radius: 50%; border: 10px solid rgba(255,255,255,0.2);">
-		
-			<h1 class="title">
-				Connecting people
-			</h1>
-			<p class="subtitle">
-				HK's No.1 P2P Payment App!
-			</p>
+	<div class="container">
+		<!-- Start Carousel -->
+		<div id="carousel-demo" class="carousel">
+			<div class="item-1">
+
+				<div class="block" style="text-align: center; margin-top: 60px;" id="frontpage">
+					<img src="/img/p2p.png" style="width: 100px; height: 100px; border-radius: 50%; border: 10px solid rgba(255,255,255,0.2);">
+				
+					<h1 class="title">
+						Connecting people
+					</h1>
+					<p class="subtitle">
+						HK's No.1 P2P Payment App!
+					</p>
+				</div>
+				<div class="block" style="text-align:center">
+					<a class="button is-primary is-light" href="/login">Sign up</a>
+					<a class="button is-warning is-light" href="/login">Log in</a>
+				</div>
+
+			</div>
+			<div class="item-2">
+				item 2
+				<!-- Slide Content -->
+			</div>
+			<div class="item-3">
+				item 3
+				<!-- Slide Content -->
+			</div>
 		</div>
-		<div class="block" style="text-align:center">
-			<a class="button is-primary is-light" href="/login">Sign up</a>
-			<a class="button is-warning is-light" href="/login">Log in</a>
-		</div>
-    </div>
+		<!-- End Carousel -->
+	</div>
 </section>
+
+<script src="https://cdn.jsdelivr.net/npm/bulma-carousel@4.0.3/dist/js/bulma-carousel.min.js"></script>
+<script>
+bulmaCarousel.attach('#carousel-demo', {
+	slidesToScroll: 1,
+	slidesToShow: 4,
+	infinite: true,
+	autoplay: true
+});
+</script>
+
+
 
 {% endif %}
 

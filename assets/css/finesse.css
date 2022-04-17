@@ -1,7 +1,7 @@
 $white: hsl(0, 0%, 100%) !default;
 $black: hsl(0, 0%, 4%);
-// $navbar-height: 3.25rem !default;
-// $navbar-background-color: $white !default;
+/* $navbar-height: 3.25rem !default; */
+/* $navbar-background-color: $white !default; */
 $modal-background-background-color: rgba($black, 0.86) !default;
 
 .overlay {
@@ -45,10 +45,10 @@ $modal-background-background-color: rgba($black, 0.86) !default;
   justify-content: flex-end;
 }
 
-// .left {
-//   background-color: green;
-//   justify-content: flex-start;
-// }
+/* .left { */
+/*  background-color: green; */
+/*   justify-content: flex-start; */
+/* } */
 
 .sidebar {
   top: 0;
@@ -99,7 +99,7 @@ body {
 }
 
 #container {
-	padding-top: 30px;
+	padding-top: 52px;
 }
 
 .title, .subtitle {
@@ -127,7 +127,12 @@ body {
 }
 
 .balance {
-	width: 200px;
+	text-align: center;
+}
+
+.balance_block {
+	text-align: left;
+	display: inline-block;
 	margin: 0 auto;
 }
 
