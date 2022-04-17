@@ -229,7 +229,8 @@ def history():
                 LEFT JOIN account AS payee ON payment.payee_id = payee.user_id
                 LEFT JOIN category ON payment.category_id = category.category_id
                 WHERE payment.payer_id = %s OR payment.payee_id = %s
-                ORDER BY payment_time DESC""")
+                ORDER BY payment_time DESC
+                LIMIT 20""")
     cursor.execute(query, (user_id, user_id))
     rows = cursor.fetchall()
     i = 0
