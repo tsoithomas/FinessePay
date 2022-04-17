@@ -2,6 +2,7 @@ from flask import Flask, request, send_from_directory, render_template, redirect
 from flask_dance.contrib.github import make_github_blueprint, github
 from flask_cors import CORS
 from time import time
+from datetime import datetime
 import mysql.connector, json, sys, hashlib, re
 import config
 
@@ -23,7 +24,7 @@ app.register_blueprint(make_github_blueprint(), url_prefix="/login")
 def index():
     if github.authorized:
         github_user = github.get("/user").json()
-        
+    
         cnx = mysql.connector.connect(user=config.MYSQL_USER, password=config.MYSQL_PASS, host=config.MYSQL_HOST, database=config.MYSQL_DATABASE)
         cursor = cnx.cursor(buffered=True)
          
@@ -36,12 +37,34 @@ def index():
             cursor.execute(query, (github_user["login"], github_user["name"]))
             cnx.commit()   
 
+        user = get_user(github_user['login'])
         
+        current_month = datetime.now().strftime('%Y-%m')    # 2022-04 
+        current_month_text = datetime.now().strftime('%B')  # April
+        
+        query = ("""SELECT category.category_name, IFNULL(SUM(user_payment.amount), 0) FROM category 
+                    LEFT JOIN (
+                        SELECT * FROM payment 
+                        WHERE payment.payer_id = %s
+                        AND payment.payment_time LIKE %s
+                        ) AS user_payment ON user_payment.category_id = category.category_id
+                    GROUP BY category.category_id
+                    ORDER BY category.category_id""")
+
+        categories = []
+        amounts = []
+        cursor.execute(query, (user["user_id"], current_month+"%"))
+        #print(cursor.statement, file=sys.stderr)
+        
+        rows = cursor.fetchall()
+        for (category_name, amount) in rows:
+            categories.append(category_name)
+            amounts.append(amount)
+
         cursor.close()
         cnx.close()
         
-        
-        return render_template('index.html', title = ' - Index', login = github_user['login'], balance=balance)
+        return render_template('index.html', title = ' - Index', login = github_user['login'], balance=balance, categories=categories, amounts=amounts, month=current_month_text)
     else:
         return render_template('index.html', title = ' - Index')
 
