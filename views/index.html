@@ -15,16 +15,39 @@
 
 {% else %}
 
+<style>
+#carousel .block {
+	text-align: center; 
+	margin-top: 80px;
+	height: 300px;
+	margin: 0 10px;
+	padding: 0 10px;
+}
+
+#carousel .block img {
+	width: 120px; 
+	height: 120px; 
+	border-radius: 50%; 
+	border: 10px solid rgba(255,255,255,0.2);
+}
+
+.slider-navigation-next, .slider-navigation-previous {
+	opacity: 0.1;
+}
+
+.slider-navigation-next:hover, .slider-navigation-previous:hover {
+	opacity: 1;
+}
+</style>
 
 
 <section class="section">
 	<div class="container">
 		<!-- Start Carousel -->
-		<div id="carousel-demo" class="carousel">
+		<div id="carousel" class="carousel">
 			<div class="item-1">
-
-				<div class="block" style="text-align: center; margin-top: 60px;" id="frontpage">
-					<img src="/img/p2p.png" style="width: 100px; height: 100px; border-radius: 50%; border: 10px solid rgba(255,255,255,0.2);">
+				<div class="block">
+					<img src="/img/p2p.png">
 				
 					<h1 class="title">
 						Connecting people
@@ -33,32 +56,73 @@
 						HK's No.1 P2P Payment App!
 					</p>
 				</div>
-				<div class="block" style="text-align:center">
-					<a class="button is-primary is-light" href="/login">Sign up</a>
-					<a class="button is-warning is-light" href="/login">Log in</a>
-				</div>
-
 			</div>
 			<div class="item-2">
-				item 2
-				<!-- Slide Content -->
+				<div class="block">
+					<img src="/img/payment.png">
+				
+					<h1 class="title">
+						Send payments
+					</h1>
+					<p class="subtitle">
+						Pay your friends in the blink of an eye.
+					</p>
+				</div>
 			</div>
 			<div class="item-3">
-				item 3
-				<!-- Slide Content -->
+				<div class="block">
+					<img src="/img/category.png">
+				
+					<h1 class="title">
+						Payment categories
+					</h1>
+					<p class="subtitle">
+						Learn more about where your money goes by categorizing your payments.
+					</p>
+				</div>
+			</div>
+			<div class="item-4">
+				<div class="block">
+					<img src="/img/schedule.png">
+				
+					<h1 class="title">
+						Schedule payments
+					</h1>
+					<p class="subtitle">
+						Pay your friends at a future date.
+					</p>
+				</div>
+			</div>
+			<div class="item-5">
+				<div class="block">
+					<img src="/img/Budget.png">
+				
+					<h1 class="title">
+						Personal budget
+					</h1>
+					<p class="subtitle">
+						Set a personal budget for your expenses and be reminded when you have reached it.
+					</p>
+				</div>
 			</div>
 		</div>
 		<!-- End Carousel -->
+		
+		<div class="block" style="text-align:center; margin-top: 40px;">
+			<a class="button is-primary is-light" href="/login">Sign up</a>
+			<a class="button is-warning is-light" href="/login">Log in</a>
+		</div>
 	</div>
 </section>
 
 <script src="https://cdn.jsdelivr.net/npm/bulma-carousel@4.0.3/dist/js/bulma-carousel.min.js"></script>
 <script>
-bulmaCarousel.attach('#carousel-demo', {
+bulmaCarousel.attach('#carousel', {
 	slidesToScroll: 1,
-	slidesToShow: 4,
+	slidesToShow: 1,
 	infinite: true,
-	autoplay: true
+	autoplay: true,
+	pagination: false
 });
 </script>
 

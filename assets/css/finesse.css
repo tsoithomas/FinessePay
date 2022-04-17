@@ -89,6 +89,8 @@ $modal-background-background-color: rgba($black, 0.86) !default;
 
 html {
 	height: 100%;
+	width: 100%;
+	overflow-x: hidden;
 }
 
 body {
@@ -96,6 +98,7 @@ body {
 	background: rgb(0,184,144);
 	background: linear-gradient(179deg, rgba(0,184,144,1) 50%, rgba(0,140,127,1) 100%);
 	background-attachment: fixed;
+	overflow-x: hidden;
 }
 
 #container {
@@ -106,10 +109,10 @@ body {
 	color: #fff;
 }
 
-#frontpage H1 {
+#carousel H1 {
 	color: #fff;
 }
-#frontpage p {
+#carousel p {
 	color: #fff;
 }
 
