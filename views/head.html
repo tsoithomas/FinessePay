@@ -30,18 +30,22 @@
 	<!-- Pushy Menu -->
 	<nav class="pushy pushy-right" data-focus="#first-link">
 		<div class="pushy-content">
+			{% if login %}
 			<ul>
-				{% if login %}
 				<li class="pushy-link"><a href="/pay">Send payment</a></li>
 				<li class="pushy-link"><a href="/schedule">Schedule payment</a></li>
 				<li class="pushy-link"><a href="/history">Payment history</a></li>
 				<li class="pushy-link"><a href="/budget">Set budget</a></li>
 				<li class="pushy-separator"><hr></li>
-				<li class="pushy-link"><a href="/logout">Log out</a></li>
-				{% else %}
-				<li class="pushy-link"><a href="/login">Sign up / Log in</a></li>
-				{% endif %}
 			</ul>
+			<div style="text-align: center;">
+				<button class="button is-dark" onclick="location.href='/logout';">Log out</button>
+			</div>
+			{% else %}
+			<ul>
+				<li class="pushy-link"><a href="/login">Sign up / Log in</a></li>
+			</ul>
+			{% endif %}
 		</div>
 	</nav>
 
