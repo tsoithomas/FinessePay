@@ -164,3 +164,9 @@ body {
 	margin: 12px;
 	background-color: #444;
 }
+
+@media screen and (min-width: 1024px) {
+	.navbar-burger {
+		 display: inherit;
+	}
+}
