@@ -66,6 +66,7 @@
 
 <script>
 $(function() {
+	var balance = {{balance}};
 	var valid_user = false;
 	var valid_amount = false;
 	
@@ -100,14 +101,21 @@ $(function() {
 	
 	// check amount
 	$("#amount").keyup(function (){
+		amount = $("#amount").val()
 		let re = /^\d+(\.\d{0,2})?$/;
-		if (re.test($("#amount").val())) {
-			$("#amount-status").slideUp("fast");
-			valid_amount = true;
-		}
-		else {
+		if (!re.test(amount)) {
+			$("#amount-status .text").text("Invalid amount");
 			$("#amount-status").slideDown("fast");
 			valid_amount = false;
+		}
+		else if (amount > balance) {
+			$("#amount-status .text").text("Insufficient balance");
+			$("#amount-status").slideDown("fast");
+			valid_amount = false;
+		}
+		else {
+			$("#amount-status").slideUp("fast");
+			valid_amount = true;
 		}
 		validate();
 	});

@@ -117,6 +117,8 @@ def pay():
     cursor.execute(query, (github_user["login"], ))
     if cursor.rowcount > 0:
         (user_id, balance) = cursor.fetchone()
+    else:
+        return redirect('/login')
         
     categories = []
     query = ("SELECT category_id, category_name FROM category ORDER BY category_id")
@@ -128,7 +130,7 @@ def pay():
     cursor.close()
     cnx.close()
         
-    return render_template('pay.html', title=' - Send payment', login=github_user['login'], categories=categories)
+    return render_template('pay.html', title=' - Send payment', login=github_user['login'], categories=categories, balance=balance)
 
 # Process send payment
 @app.route("/pay_submit", methods=['POST'])
@@ -221,15 +223,12 @@ def schedule():
     cursor = cnx.cursor(buffered=True)
      
     query = ("SELECT user_id, balance FROM account WHERE username = %s")
-    results = cursor.execute(query, (github_user["login"], ))
-    if cursor.rowcount > 0:
-        (user_id, balance) = cursor.fetchone()
-
-    query = ("SELECT user_id, balance FROM account WHERE username = %s")
     cursor.execute(query, (github_user["login"], ))
     if cursor.rowcount > 0:
         (user_id, balance) = cursor.fetchone()
-        
+    else:
+        return redirect('/login')
+    
     categories = []
     query = ("SELECT category_id, category_name FROM category ORDER BY category_id")
     cursor.execute(query)
@@ -243,7 +242,7 @@ def schedule():
     tomorrow = datetime.date.today() + datetime.timedelta(days=1)
     tomorrow = tomorrow.strftime('%Y-%m-%d')
     
-    return render_template('schedule.html', title=' - Schedule payment', login=github_user['login'], categories=categories, tomorrow=tomorrow)
+    return render_template('schedule.html', title=' - Schedule payment', login=github_user['login'], categories=categories, tomorrow=tomorrow, balance=balance)
 
 # Process schedule payment
 @app.route("/schedule_submit", methods=['POST'])
