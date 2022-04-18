@@ -2,7 +2,7 @@
 
 {% if login %}
 
-<section class="section">
+<section class="section" style="padding-bottom: 0">
     <div class="container">
         <div class="block balance">
 			<div class="balance_block">
@@ -13,7 +13,36 @@
     </div>
 </section>
 
-<section class="section" style="padding-top: 0">
+{% if status == "warning" %}
+<section class="section" style="padding-bottom: 0">
+    <div class="container">
+		<article class="message is-warning">
+			<div class="message-header">
+				<p>Budget notification</p>
+			</div>
+			<div class="message-body">
+				Your expenses have reached 80% of your monthly budget.
+			</div>
+		</article>
+    </div>
+</section>
+{% elif status == "danger" %}
+<section class="section">
+    <div class="container">
+		<article class="message is-danger">
+			<div class="message-header">
+				<p>Budget notification</p>
+			</div>
+			<div class="message-body">
+				Your expenses have reached 100% of your monthly budget.
+			</div>
+		</article>
+    </div>
+</section>
+{% endif %}
+
+
+<section class="section">
     <div class="container">
 		<h1 class="title">Expenses</h1>
 		<div class="block chart-container" style="margin: 0 auto;position: relative; width: 90%; height: 90%; max-width: 300px; max-height: 300px">

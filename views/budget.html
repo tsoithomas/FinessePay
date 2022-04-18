@@ -72,7 +72,7 @@ function validate() {
 			<div class="field" id="budget_block" {% if not enable %}style="display: none"{% endif %} onload="console.log('11')">
 				<label class="label">Budget</label>
 				<div class="control">
-					<input class="input is-primary" type="number" name="budget" id="budget" {% if budget %}value="{{budget}}"{% endif %} step="1" min="100" max="99999" autocomplete="off">
+					<input class="input is-primary" type="number" name="budget" id="budget" {% if budget %}value="{{budget}}"{% else %}value="100"{% endif %} step="1" min="100" max="99999" autocomplete="off">
 					<div class="status" id="budget-status" style="display: none">
 						<span class="icon-text has-text-danger">
 							<span class="icon">

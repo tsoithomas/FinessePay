@@ -217,7 +217,7 @@ function check_date() {
 			</div>
 		  </div>
 
-		  <div class="field">
+		  <div class="field is-primary">
 			<label class="label">Scheduled date</label>
 			<div class="control">
 				<input type="date" id="date" name="date" class="is-primary" 
@@ -226,7 +226,7 @@ function check_date() {
 					data-show-footer="false" 
 					data-show-clear-button="false" 
 					data-date-format="yyyy-MM-dd" 
-					data-min-date="2022-04-19" 
+					data-min-date="{{tomorrow}}" 
 					data-show-today-button="false">
 				<div class="status" id="date-status" style="display: none">
 					<span class="icon-text has-text-danger">
