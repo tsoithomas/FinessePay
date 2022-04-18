@@ -1,27 +1,90 @@
 {% include "head.html" ignore missing %}
 
 <script>
+var valid_enable = false;
+var valid_budget = false;
+
 $(function() {
-
+	$("#enable").change(function() {
+		check_enable();
+		validate();
+	});
+	$("#enable").change();
+	
+	
+	// check amount
+	$("#budget").keyup(function (){
+		check_budget();
+		validate();
+	});
+	
+	check_enable();
+	check_budget();
+	validate();
 });
-</script>
 
+function check_enable() {
+	if ($("#enable").prop("checked")) {
+		$("#budget_block").slideDown("fast");
+		valid_enable = false;
+	}
+	else {
+		$("#budget_block").slideUp("fast");
+		valid_enable = true;
+	}
+}
+
+function check_budget() {
+	let re = /^\d+$/;
+	if (re.test($("#budget").val())) {
+		$("#budget-status").slideUp("fast");
+		valid_budget = true;
+	}
+	else {
+		$("#budget-status").slideDown("fast");
+		valid_budget = false;
+	}
+}
+
+
+// validate
+function validate() {
+	if (valid_enable || valid_budget) {
+		$('#submit').prop('disabled', false);
+	}
+	else {
+		$('#submit').prop('disabled', true);
+	}
+}
+
+</script>
 
 <section class="section">
     <div class="container">
-
 		<h1 class="title">Budget</h1>
-		
-		<form class="box" id="form">
 
-		  <div class="field">
-			<label class="label">Budget</label>
-			<div class="control">
-				<input class="input is-primary" type="amount">
+		<form class="box" id="form" action="/budget_submit" method="post">
+			<div class="field">
+				<input type="checkbox" name="enable" id="enable" class="switch" value="1" {% if enable == True %}checked{% endif %}>
+				<label for="enable">Enable budget notification</label>
 			</div>
-		  </div>
 
-		  <button class="button is-primary">Set Budget</button>
+			<div class="field" id="budget_block" {% if not enable %}style="display: none"{% endif %} onload="console.log('11')">
+				<label class="label">Budget</label>
+				<div class="control">
+					<input class="input is-primary" type="number" name="budget" id="budget" {% if budget %}value="{{budget}}"{% endif %} step="1" min="100" max="99999" autocomplete="off">
+					<div class="status" id="budget-status" style="display: none">
+						<span class="icon-text has-text-danger">
+							<span class="icon">
+								<i class="fas fa-exclamation-triangle"></i>
+							</span>
+							<span class="text">Invalid amount</span>
+						</span>
+					</div>
+				</div>
+			</div>
+
+		  <button class="button is-primary" id="submit" disabled >Set budget</button>
 		</form>
 
     </div>

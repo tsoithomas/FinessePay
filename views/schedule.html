@@ -1,39 +1,212 @@
 {% include "head.html" ignore missing %}
 
-<script>
-$(function() {
+<style>
+.ui-helper-hidden-accessible { position: absolute; left:-999em; }
 
+.ui-autocomplete {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    float: left;
+    display: none;
+    min-width: 160px;   
+    padding: 4px 0;
+    margin: 0 0 10px 25px;
+    list-style: none;
+    background-color: #ffffff;
+    border-color: #ccc;
+    border-color: rgba(0, 0, 0, 0.2);
+    border-style: solid;
+    border-width: 1px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding;
+    background-clip: padding-box;
+    *border-right-width: 2px;
+    *border-bottom-width: 2px;
+}
+
+.ui-menu-item > div {
+    display: block;
+	padding: 5px 15px !important;
+}
+
+.ui-menu-item > a.ui-corner-all {
+    display: block;
+    padding: 3px 15px;
+    clear: both;
+    font-weight: normal;
+    line-height: 18px;
+    color: #555555;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.ui-state-hover, .ui-state-active {
+    color: #ffffff;
+    text-decoration: none;
+    background-color: #00b890;
+    border-radius: 0px;
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    background-image: none;
+}
+
+.status {
+	color: #eb623f;
+	padding-top: 5px;
+}
+</style>
+
+<script>
+var valid_user = false;
+var valid_amount = false;
+var valid_date = false;
+
+$(function() {
+	
+	// check username
+	$("#payee").keyup(function (){
+		user = $("#payee").val();
+		if (user.length > 3) {
+			$.ajax({
+				type: "POST",
+				url: "/check_user",
+				data: { s: user},
+				success: function(data) {
+					if (data.is_valid) {
+						$("#payee-status").slideUp("fast");
+						valid_user = true;
+					}
+					else {
+						$("#payee-status").slideDown("fast");
+						valid_user = false;
+					}
+					validate();
+				},
+				dataType: "json"
+			});
+		}
+		else {
+			$("#payee-status").slideDown("fast");
+			valid_user = false;
+			validate();
+		}
+	});
+	
+	// check amount
+	$("#amount").keyup(function (){
+		let re = /^\d+(\.\d{0,2})?$/;
+		if (re.test($("#amount").val())) {
+			$("#amount-status").slideUp("fast");
+			valid_amount = true;
+		}
+		else {
+			$("#amount-status").slideDown("fast");
+			valid_amount = false;
+		}
+		validate();
+	});
+	
+	
+	$(".datetimepicker-clear-button").click(function() {
+		$("#date").val("");
+		check_date();
+	});
+	
+	$("#submit").click(function() {
+		$("#form").submit();
+	});
+	
+	
 });
+
+// validate
+function validate() {
+	if (valid_user && valid_amount && valid_date) {
+		$('#submit').prop('disabled', false);
+	}
+	else {
+		$('#submit').prop('disabled', true);
+	}
+}
+	
+// check date
+function check_date() {
+	date = $("#date").val();
+	let re = /^20\d\d\-[01][0-9]\-[0-3][0-9]$/;
+	if (re.test(date)) {
+		$("#date-status").slideUp("fast");
+		valid_date = true;
+	}
+	else {
+		$("#date-status").slideDown("fast");
+		valid_date = false;
+	}
+	validate();
+}
+
 </script>
 
 
 <section class="section">
     <div class="container">
-		<h1 class="title">Schedule payment</h1>
 
-		<form class="box" id="form">
+		<h1 class="title">Schedule payment</h1>
+		
+		<div class="block">
+			<a class="button is-link" href="/scheduled">
+				<span class="icon is-small">
+					<i class="fa-solid fa-calendar-check"></i>
+				</span>
+				<span>Scheduled payments</span>
+			</a>
+		</div>
+		
+		<form class="box" id="form" action="/schedule_submit" method="post">
 		  <div class="field">
-			<label class="label">Payee</label>
+			<label class="label">Payee username</label>
 			<div class="control">
-				<input class="input is-primary" type="payee">
+				<input class="input is-primary" type="input" name="payee" id="payee" pattern="[A-Za-z0-9]+" autocomplete="off" title="Only letters and numbers are allowed.">
+				<div class="status" id="payee-status" style="display: none">
+					<span class="icon-text has-text-danger">
+						<span class="icon">
+							<i class="fas fa-exclamation-triangle"></i>
+						</span>
+						<span class="text">Invalid username</span>
+					</span>
+				</div>
 			</div>
 		  </div>
 
 		  <div class="field">
 			<label class="label">Amount</label>
 			<div class="control">
-				<input class="input is-primary" type="amount">
+				<input class="input is-primary" type="number" name="amount" id="amount" step="0.01" min="0" max="99999" autocomplete="off">
+				<div class="status" id="amount-status" style="display: none">
+					<span class="icon-text has-text-danger">
+						<span class="icon">
+							<i class="fas fa-exclamation-triangle"></i>
+						</span>
+						<span class="text">Invalid amount</span>
+					</span>
+				</div>
 			</div>
 		  </div>
 
 		  <div class="field">
 			<label class="label">Payment category</label>
 			<div class="control">
-				
 				<div class = "field">
 					<div class = "control">
 						<div class = "select is-primary">
-							<select>
+							<select name="category" id="category">
 								{% for category in categories %}
 								<option value="{{category.id}}">{{category.name}}</option>
 								{% endfor %}
@@ -44,11 +217,25 @@ $(function() {
 			</div>
 		  </div>
 
-
 		  <div class="field">
 			<label class="label">Scheduled date</label>
 			<div class="control">
-				<input type="date" id="my-element" data-display-mode="default">
+				<input type="date" id="date" name="date" class="is-primary" 
+					data-type="date" 
+					data-display-mode="default" 
+					data-show-footer="false" 
+					data-show-clear-button="false" 
+					data-date-format="yyyy-MM-dd" 
+					data-min-date="2022-04-19" 
+					data-show-today-button="false">
+				<div class="status" id="date-status" style="display: none">
+					<span class="icon-text has-text-danger">
+						<span class="icon">
+							<i class="fas fa-exclamation-triangle"></i>
+						</span>
+						<span class="text">Invalid date</span>
+					</span>
+				</div>
 				<script>
 				// Initialize all input of type date
 				var calendars = bulmaCalendar.attach('[type="date"]');
@@ -57,23 +244,24 @@ $(function() {
 				for(var i = 0; i < calendars.length; i++) {
 					// Add listener to select event
 					calendars[i].on('select', date => {
-						console.log(date);
+						//console.log(date);
 					});
 				}
 
 				// To access to bulmaCalendar instance of an element
-				var element = document.querySelector('#my-element');
+				var element = document.querySelector('#date');
 				if (element) {
 					// bulmaCalendar instance is available as element.bulmaCalendar
 					element.bulmaCalendar.on('select', function(datepicker) {
-						console.log(datepicker.data.value());
+						$("#date").val(datepicker.data.value());
+						check_date();
 					});
 				}
 				</script>
 			</div>
 		  </div>
 		  
-		  <button class="button is-primary">Send payment</button>
+		  <button class="button is-primary" id="submit" disabled >Schedule payment</button>
 		</form>
 
     </div>

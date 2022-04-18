@@ -1,0 +1,77 @@
+{% include "head.html" ignore missing %}
+
+<style>
+
+.date {
+	font-weight: bold;
+	font-size: 0.8rem;
+	text-transform: uppercase;
+}
+
+.party {
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+
+.amount {
+	text-align: right !important;
+	font-weight: bold;
+}
+
+.green {
+	color: darkgreen;
+}
+
+.red {
+	color: darkred;
+}
+
+</style>
+
+<script>
+	$(function() {
+		$(".delete").click(function() {
+			$("#id").val($(this).data("id"));
+			$("#form").submit();
+		});
+	});
+</script>
+
+<form action="/schedule_delete" method="post" id="form">
+	<section class="section">
+		<div class="container">
+			<h1 class="title">Scheduled payments</h1>
+		
+			<div class="box">
+				<table class="table is-fullwidth">
+					<tbody>
+						{% for record in records %}
+						<tr>
+							<td colspan=2 class="date is-primary">{{record.date}}</td>
+						</tr>
+						{% for transaction in record.transactions %}
+						<tr>
+							<td>
+								<div class="party">{{transaction.party}}</div>
+								<div class="category">{{transaction.category}}</div>
+							</td>
+							<td class="amount">
+								<div>{{transaction.amount}}</div>
+								<div style="margin-top: 4px"><button class="delete" data-id="{{transaction.id}}"></button></div>
+							</td>
+						</tr>
+						{% endfor %}
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</section>
+
+	<input type="hidden" name="id" id="id">
+</form>
+
+
+
+
+{% include "tail.html" ignore missing %}

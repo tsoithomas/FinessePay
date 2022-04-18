@@ -203,6 +203,147 @@ def schedule():
         
     return render_template('schedule.html', title=' - Schedule payment', login=github_user['login'], categories=categories)
  
+  
+
+@app.route("/schedule_submit", methods=['POST'])
+def schedule_submit():
+    if not github.authorized:
+        return redirect('/login')
+        
+    github_user = github.get("/user").json()
+    
+    payer = get_user(github_user['login'])
+    payer_id = payer["user_id"]
+    
+    payee = get_user(request.form.get('payee'))
+    payee_id = payee["user_id"]
+    
+    amount = request.form.get('amount')
+    category_id = request.form.get('category')
+    date = request.form.get('date')
+    
+    if payee_id is not None and re.match("^\d+(\.\d{0,2})?$", str(amount)) is not None and re.match("^20\d\d\-[01][0-9]\-[0-3][0-9]$", str(date)) is not None:
+        cnx = mysql.connector.connect(user=config.MYSQL_USER, password=config.MYSQL_PASS, host=config.MYSQL_HOST, database=config.MYSQL_DATABASE)
+        cursor = cnx.cursor(buffered=True)
+        
+        insert_payment = ("INSERT INTO schedule (payer_id, payee_id, amount, category_id, schedule_date) VALUES(%s, %s, %s, %s, %s)")
+        cursor.execute(insert_payment, (payer_id, payee_id, amount, category_id, date))
+        payment_id = cursor.lastrowid
+        
+        cnx.commit()
+            
+        cursor.close()
+        cnx.close()
+                
+        return redirect('/scheduled')
+    else:
+        return redirect('/schedule_fail')
+    
+ 
+@app.route("/scheduled")
+def scheduled():
+    if not github.authorized:
+        return redirect('/login')
+        
+    github_user = github.get("/user").json()
+
+    user = get_user(github_user['login'])
+    user_id = user["user_id"]
+
+    cnx = mysql.connector.connect(user=config.MYSQL_USER, password=config.MYSQL_PASS, host=config.MYSQL_HOST, database=config.MYSQL_DATABASE)
+    cursor = cnx.cursor(buffered=True)
+     
+    records = []
+    current_date = ""
+    date_records = []
+    query = ("""SELECT 
+                    payment_id, payer.user_id, payer.username, payer.nickname, 
+                    payee.user_id, payee.username, payee.nickname, 
+                    amount, category.category_name, DATE_FORMAT(schedule_date, "%e %b %Y") 
+                FROM schedule 
+                LEFT JOIN account AS payer ON schedule.payer_id = payer.user_id
+                LEFT JOIN account AS payee ON schedule.payee_id = payee.user_id
+                LEFT JOIN category ON schedule.category_id = category.category_id
+                WHERE schedule.payer_id = %s 
+                ORDER BY schedule_date ASC""")
+    cursor.execute(query, (user_id, ))
+    
+    rows = cursor.fetchall()
+    i = 0
+    rowcount = cursor.rowcount
+    
+    for (payment_id, payer_id, payer_username, payer_nickname, payee_id, payee_username, payee_nickname, amount, category, date) in rows:
+        if i == 0:
+            current_date = date
+
+        if date != current_date:
+            records.append({"date": current_date, "transactions": date_records})
+            current_date = date
+            date_records = []
+
+        if payer_nickname == "":
+            payer = payer_username
+        else:
+            payer = payer_nickname
+            
+        if payee_nickname == "":
+            payee = payee_username
+        else:
+            payee = payee_nickname
+    
+        if user_id == payer_id:
+            party = payee
+        elif user_id == payee_id:
+            party = payer
+
+        date_records.append({"party": party, "amount": amount, "category": category, "id": payment_id})
+        
+        i += 1
+        
+        if i == rowcount:
+            records.append({"date": current_date, "transactions": date_records})
+
+    cursor.close()
+    cnx.close()
+    
+    return render_template('scheduled.html', title=' - Scheduled payments', login=github_user['login'], records=records)
+
+
+@app.route("/schedule_delete", methods=['POST'])
+def schedule_delete():
+    if not github.authorized:
+        return redirect('/login')
+        
+    github_user = github.get("/user").json()
+    
+    payment_id = request.form.get('id')
+    
+    user = get_user(github_user['login'])
+    user_id = user["user_id"]
+    
+    cnx = mysql.connector.connect(user=config.MYSQL_USER, password=config.MYSQL_PASS, host=config.MYSQL_HOST, database=config.MYSQL_DATABASE)
+    cursor = cnx.cursor(buffered=True)
+    
+    query = ("DELETE FROM schedule WHERE payment_id = %s AND payer_id = %s")
+    cursor.execute(query, (payment_id, user_id))
+    cnx.commit()
+        
+    cursor.close()
+    cnx.close()
+    
+    return redirect('/scheduled')
+ 
+
+
+@app.route("/schedule_fail")
+def schedule_fail():
+    if not github.authorized:
+        return redirect('/login')
+        
+    github_user = github.get("/user").json()
+    
+    return render_template('schedule_fail.html', title=' - Schedule payment', login=github_user['login'])
+ 
  
 @app.route("/history")
 def history():
@@ -273,12 +414,9 @@ def history():
         if i == rowcount:
             records.append({"date": current_date, "transactions": date_records})
 
-    
     cursor.close()
     cnx.close()
 
-    #records = [{"date": "2022-05-03", "transactions": [{"party": "Thomas Tsoi", "amount": 234.20}]}]
-        
     return render_template('history.html', title=' - Payment history', login=github_user['login'], balance=user["balance"], records=records)
  
  
@@ -289,13 +427,56 @@ def budget():
         
     github_user = github.get("/user").json()
 
-
+    user = get_user(github_user['login'])
+    user_id = user["user_id"]
     
-        
-    return render_template('budget.html', title=' - Budget', login=github_user['login'])
+    cnx = mysql.connector.connect(user=config.MYSQL_USER, password=config.MYSQL_PASS, host=config.MYSQL_HOST, database=config.MYSQL_DATABASE)
+    cursor = cnx.cursor(buffered=True)
+     
+    query = ("SELECT enable, budget FROM budget WHERE user_id = %s")
+    results = cursor.execute(query, (user_id, ))
+    if cursor.rowcount > 0:
+        (enable, budget) = cursor.fetchone()
+    else:
+        query = ("INSERT IGNORE INTO budget(user_id, enable, budget) VALUES (%s, 0, 0)")
+        cursor.execute(query, (user_id, ))
+        cnx.commit()
+        enable = False
+        budget = 0
  
+    return render_template('budget.html', title=' - Budget', login=github_user['login'], enable=enable, budget=round(budget, 0))
  
- 
+  
+@app.route("/budget_submit", methods=['POST'])
+def budget_submit():
+    if not github.authorized:
+        return redirect('/login')
+
+    github_user = github.get("/user").json()
+
+    user = get_user(github_user['login'])
+    user_id = user["user_id"]
+    
+    enable = request.form.get('enable')
+    if enable == "1":
+        enable = 1
+    else:
+        enable = 0
+    budget = request.form.get('budget')
+    
+    cnx = mysql.connector.connect(user=config.MYSQL_USER, password=config.MYSQL_PASS, host=config.MYSQL_HOST, database=config.MYSQL_DATABASE)
+    cursor = cnx.cursor(buffered=True)
+    
+    query = ("UPDATE budget SET enable = %s, budget = %s WHERE user_id = %s")
+    cursor.execute(query, (enable, budget, user_id))
+    cnx.commit()
+
+    cursor.close()
+    cnx.close()
+
+    return redirect('/budget')
+
+
 @app.route("/search", methods=['GET'])
 def search():
     if not github.authorized:
@@ -364,13 +545,13 @@ def get_user(username: str):
     cnx = mysql.connector.connect(user=config.MYSQL_USER, password=config.MYSQL_PASS, host=config.MYSQL_HOST, database=config.MYSQL_DATABASE)
     cursor = cnx.cursor(buffered=True)
 
-    query = ("SELECT user_id, nickname, balance, budget FROM account WHERE username = %s")
+    query = ("SELECT user_id, nickname, balance FROM account WHERE username = %s")
     results = cursor.execute(query, (username, ))
     if cursor.rowcount > 0:
-        (user_id, nickname, balance, budget) = cursor.fetchone()
-        user = {"user_id": user_id, "nickname": nickname, "balance": balance, "budget": budget}
+        (user_id, nickname, balance) = cursor.fetchone()
+        user = {"user_id": user_id, "nickname": nickname, "balance": balance}
     else:
-        user = {"user_id": None, "nickname": None, "balance": None, "budget": None}
+        user = {"user_id": None, "nickname": None, "balance": None}
 
     cursor.close()
     cnx.close()
