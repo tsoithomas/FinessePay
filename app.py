@@ -452,7 +452,10 @@ def history():
             party = "Error"
             style = "error"
 
-        date_records.append({"party": party, "amount": amount, "category": category, "style": style})
+
+        refid = hashlib.sha1(str(payment_id).encode()).hexdigest()[0:6]
+
+        date_records.append({"party": party, "amount": amount, "category": category, "style": style, "refid": refid})
         
         i += 1
         

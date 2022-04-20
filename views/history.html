@@ -24,6 +24,12 @@ $(function() {
 	font-weight: bold;
 }
 
+.refid {
+	text-align: right !important;
+	color: darkgray;
+	margin-top: 4px;
+}
+
 .green {
 	color: darkgreen;
 }
@@ -59,7 +65,10 @@ $(function() {
 						<div class="party">{{transaction.party}}</div>
 						<div class="category">{{transaction.category}}</div>
 					</td>
-					<td class="amount {{transaction.style}}">{{transaction.amount}}</td>
+					<td>
+						<div class="amount {{transaction.style}}">{{transaction.amount}}</div>
+						<div class="refid">{{transaction.refid}}</div>
+					</td>
 				</tr>
 				{% endfor %}
 				{% endfor %}

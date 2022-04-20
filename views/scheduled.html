@@ -18,6 +18,11 @@
 	font-weight: bold;
 }
 
+.status {
+	text-align: right !important;
+	margin-top: 4px;
+}
+
 .green {
 	color: darkgreen;
 }
@@ -56,9 +61,9 @@
 								<div class="party">{{transaction.party}}</div>
 								<div class="category">{{transaction.category}}</div>
 							</td>
-							<td class="amount">
-								<div>{{transaction.amount}}</div>
-								<div style="margin-top: 4px">
+							<td>
+								<div class="amount">{{transaction.amount}}</div>
+								<div class="status">
 									{% if transaction.status == "scheduled" %}
 										<button class="delete is-medium" data-id="{{transaction.id}}"></button>
 										<span class="tag is-info">Scheduled</span> 
