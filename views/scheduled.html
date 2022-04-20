@@ -58,7 +58,18 @@
 							</td>
 							<td class="amount">
 								<div>{{transaction.amount}}</div>
-								<div style="margin-top: 4px"><button class="delete" data-id="{{transaction.id}}"></button></div>
+								<div style="margin-top: 4px">
+									{% if transaction.status == "scheduled" %}
+										<button class="delete is-medium" data-id="{{transaction.id}}"></button>
+										<span class="tag is-info">Scheduled</span> 
+									{% elif transaction.status == "complete" %}
+										<span class="tag is-success">Complete</span>
+									{% elif transaction.status == "nofund" %}
+										<span class="tag is-danger">Insufficient fund</span>
+									{% elif transaction.status == "failed" %}
+										<span class="tag is-danger">Failed</span>
+									{% endif %}
+								</div>
 							</td>
 						</tr>
 						{% endfor %}

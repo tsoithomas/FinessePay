@@ -155,25 +155,31 @@ def pay_submit():
         if payer_balance < Decimal(amount):
             return redirect('/pay_insuf')
         else:
-            cnx = mysql.connector.connect(user=config.MYSQL_USER, password=config.MYSQL_PASS, host=config.MYSQL_HOST, database=config.MYSQL_DATABASE)
-            cursor = cnx.cursor(buffered=True)
-            
-            insert_payment = ("INSERT INTO payment (payer_id, payee_id, amount, category_id, payment_time) VALUES(%s, %s, %s, %s, NOW())")
-            cursor.execute(insert_payment, (payer_id, payee_id, amount, category_id))
-            payment_id = cursor.lastrowid
-            
-            update_payer_balance = ("UPDATE account SET balance = balance - %s WHERE user_id = %s")
-            cursor.execute(update_payer_balance, (amount, payer_id))
-            
-            update_payee_balance = ("UPDATE account SET balance = balance + %s WHERE user_id = %s")
-            cursor.execute(update_payee_balance, (amount, payee_id))
-            
-            cnx.commit()
+            try:
+                cnx = mysql.connector.connect(user=config.MYSQL_USER, password=config.MYSQL_PASS, host=config.MYSQL_HOST, database=config.MYSQL_DATABASE)
+                cursor = cnx.cursor(buffered=True)
                 
-            cursor.close()
-            cnx.close()
+                insert_payment = ("INSERT INTO payment (payer_id, payee_id, amount, category_id, payment_time) VALUES(%s, %s, %s, %s, NOW())")
+                cursor.execute(insert_payment, (payer_id, payee_id, amount, category_id))
+                payment_id = cursor.lastrowid
+                
+                update_payer_balance = ("UPDATE account SET balance = balance - %s WHERE user_id = %s")
+                cursor.execute(update_payer_balance, (amount, payer_id))
+                
+                update_payee_balance = ("UPDATE account SET balance = balance + %s WHERE user_id = %s")
+                cursor.execute(update_payee_balance, (amount, payee_id))
+                
+                cnx.commit()
+
+                refid = hashlib.sha1(str(payment_id).encode()).hexdigest()[0:6]
+            except mysql.connector.Error as error:
+                cnx.rollback()
+                redirect('/pay_fail')
+            finally:
+                if cnx.is_connected():
+                    cursor.close()
+                    cnx.close()
                     
-            refid = hashlib.sha1(str(payment_id).encode()).hexdigest()[0:6]
             return redirect('/pay_succuess?q='+refid)
     else:
         return redirect('/pay_fail')
@@ -297,14 +303,14 @@ def scheduled():
     current_date = ""
     date_records = []
     query = ("""SELECT 
-                    payment_id, payer.user_id, payer.username, payer.nickname, 
+                    schedule_id, payer.user_id, payer.username, payer.nickname, 
                     payee.user_id, payee.username, payee.nickname, 
-                    amount, category.category_name, DATE_FORMAT(schedule_date, "%e %b %Y") 
+                    amount, category.category_name, status, DATE_FORMAT(schedule_date, "%e %b %Y") 
                 FROM schedule 
                 LEFT JOIN account AS payer ON schedule.payer_id = payer.user_id
                 LEFT JOIN account AS payee ON schedule.payee_id = payee.user_id
                 LEFT JOIN category ON schedule.category_id = category.category_id
-                WHERE schedule.payer_id = %s 
+                WHERE schedule.payer_id = %s AND schedule_date > SUBDATE(CURDATE(), INTERVAL 30 DAY)
                 ORDER BY schedule_date ASC""")
     cursor.execute(query, (user_id, ))
     
@@ -312,7 +318,7 @@ def scheduled():
     i = 0
     rowcount = cursor.rowcount
     
-    for (payment_id, payer_id, payer_username, payer_nickname, payee_id, payee_username, payee_nickname, amount, category, date) in rows:
+    for (schedule_id, payer_id, payer_username, payer_nickname, payee_id, payee_username, payee_nickname, amount, category, status, date) in rows:
         if i == 0:
             current_date = date
 
@@ -336,7 +342,7 @@ def scheduled():
         elif user_id == payee_id:
             party = payer
 
-        date_records.append({"party": party, "amount": amount, "category": category, "id": payment_id})
+        date_records.append({"party": party, "amount": amount, "category": category, "status": status, "id": schedule_id})
         
         i += 1
         
@@ -356,7 +362,7 @@ def schedule_delete():
         
     github_user = github.get("/user").json()
     
-    payment_id = request.form.get('id')
+    schedule_id = request.form.get('id')
     
     user = get_user(github_user['login'])
     user_id = user["user_id"]
@@ -364,8 +370,8 @@ def schedule_delete():
     cnx = mysql.connector.connect(user=config.MYSQL_USER, password=config.MYSQL_PASS, host=config.MYSQL_HOST, database=config.MYSQL_DATABASE)
     cursor = cnx.cursor(buffered=True)
     
-    query = ("DELETE FROM schedule WHERE payment_id = %s AND payer_id = %s")
-    cursor.execute(query, (payment_id, user_id))
+    query = ("DELETE FROM schedule WHERE schedule_id = %s AND payer_id = %s")
+    cursor.execute(query, (schedule_id, user_id))
     cnx.commit()
         
     cursor.close()
