@@ -3,8 +3,7 @@ A proof-of-concept demo of a P2P payment mobile app.
 
 ## Table of Contents
 1. [Introduction](#introduction)
-2. A GIF or image of the working demo
-3. [Getting Started](#getting-started)
+2. [Getting Started](#getting-started)
 3. [Usage](#usage)
 4. [Contributing](#contributing)
 5. [License](#license)
@@ -16,6 +15,14 @@ The electronic payment system in Hong Kong is gaining popularity in recent years
 Several apps such as MoneyPro, AndroMoney and Moze are providing personal budgeting and accounting functions. Users need to manually input their incomes and expenditures and choose the corresponding type.  Data Visualization for income and expenditure is also available for budgeting purposes. 
 
 The electronic payment functions and personal budgeting functions are crucial to people. However, currently there are no applications that integrate these functions together. This creates troubles for people. For example, when Peter uses Payme to transfer money to his friends for the meals, Payme only records the amount of money transfer and the payee. Peter needs to input the data manually in another application AndroMoney for recording and budgeting. This deters people from budgeting.
+
+![FinessePay](https://github.com/tsoithomas/FinessePay/blob/master/FinessePay1.png?raw=true)
+![FinessePay](https://github.com/tsoithomas/FinessePay/blob/master/FinessePay2.png?raw=true)
+![FinessePay](https://github.com/tsoithomas/FinessePay/blob/master/FinessePay3.png?raw=true)
+![FinessePay](https://github.com/tsoithomas/FinessePay/blob/master/FinessePay4.png?raw=true)
+![FinessePay](https://github.com/tsoithomas/FinessePay/blob/master/FinessePay5.png?raw=true)
+![FinessePay](https://github.com/tsoithomas/FinessePay/blob/master/FinessePay6.png?raw=true)
+![FinessePay](https://github.com/tsoithomas/FinessePay/blob/master/FinessePay7.png?raw=true)
 
 ### Use of FinessePay
 Therefore, we are dedicated to integrating electronic payment and budgeting in one single application for users’ convenience. FinessePay enables users to record transactions and budgeting while they are making P2P payments. The target audience is anyone who desires a detailed record of transactions for personal finance management. 
