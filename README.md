@@ -1,6 +1,8 @@
 # FinessePay
 This is a proof-of-concept demo of a P2P payment mobile app which I completed as a project for the course COMP7300 Financial Technology of the program MSc in Data Analytics and Artificial Intelligence at Hong Kong Baptist University.
 
+The app is implemented with Flask, Python and MySQL.
+
 ## Table of Contents
 1. [Introduction](#introduction)
 2. [Functions](#functions)
