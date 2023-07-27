@@ -5,7 +5,7 @@ The app is implemented with Flask, Python and MySQL.
 
 ## Table of Contents
 1. [Introduction](#introduction)
-2. [Functions](#functions)
+2. [Features](#features)
 3. [Contributing](#contributing)
 4. [License](#license)
 
@@ -20,7 +20,7 @@ FinessePay enables users to record transactions and budgeting while they are mak
 ![FinessePay](https://github.com/tsoithomas/FinessePay/blob/master/FinessePay6.png?raw=true)
 ![FinessePay](https://github.com/tsoithomas/FinessePay/blob/master/FinessePay7.png?raw=true)
 
-## Functions
+## Features
 ### Payment
 #### Send Payment
 Users can enter this interface through the drop-down menu in the upper right corner, they need to input the username, payment amount and the payment category(optional) in this interface.
